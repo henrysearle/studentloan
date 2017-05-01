@@ -1,0 +1,234 @@
+<ion-content padding>
+
+  <h1>Summary</h1>
+
+  <div *ngIf="loanData && chartDataReady">
+    <canvas baseChart
+            [datasets]="loanData.chartData()"
+            [labels]="loanData.chartLabels()"
+            [options]="repaymentChartOptions"
+            [legend]="true"
+            [chartType]="repaymentChartType">
+    </canvas>
+  </div>
+
+  <p>
+    You will pay off your student loan in <strong>{{ loanData.lastPaybackDate() }}</strong>,
+    <strong>{{ loanData.lastPaybackDate() - loanData.getGraduationYear() }}</strong> years after you graduate.
+  </p>
+  <p>
+    This is based on a <strong>lawyers</strong> salary starting at
+    <strong>{{ loanData.salaryInfo[0].money | currency : 'GBP' : true : '1.0-0' }}</strong> and ending at
+    <strong>{{ loanData.salaryInfo[loanData.salaryInfo.length - 1].money | currency : 'GBP' : true : '1.0-0' }}</strong>.
+  </p>
+
+
+  <h2>Loan Breakdown</h2>
+  <p>
+    Estimated owed when you graduate:
+    <strong>{{ loanData.getTotalLoan() + loanData.getTotalInterest() | currency : 'GBP' : true : '1.0-0' }}</strong>
+  </p>
+
+  <div class="accordion-container" [ngClass]="{'open': accordion[0] }">
+
+    <div class="accordion-opener">
+      <button no-padding ion-button clear class="accordion-opener-closed" (click)="accordion[0] = true">See breakdown ></button>
+      <button no-padding ion-button clear class="accordion-opener-open" (click)="accordion[0] = false">Hide breakdown ></button>
+    </div>
+    <div class="accordion-content">
+      <div>
+
+        <h3>How much you will owe</h3>
+
+        <p>
+          The amount you owe when you graduate is dependent on a few factors which will mostly effect your maintenance loan.
+          We've estimated the loan based on a <strong>3 year course</strong>, <strong>living in London</strong>
+          <strong>away from your parents</strong>. We've also estimated RPI for 2017-2019.
+        </p>
+
+        <div>
+          <div>
+            <ion-row>
+              <ion-col>
+                <strong>Year</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Tuition</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Maintenance</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Total</strong>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngFor="let l of loanData.loan.loanBreakdown">
+              <ion-col>
+                {{l.year}}
+              </ion-col>
+              <ion-col>
+                {{l.tuition | currency : 'GBP' : true : '1.0-0'}}
+              </ion-col>
+              <ion-col>
+                {{l.maintenance | currency : 'GBP' : true : '1.0-0'}}
+              </ion-col>
+              <ion-col>
+                {{l.maintenance + l.tuition | currency : 'GBP' : true : '1.0-0'}}
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <strong>Total</strong>
+              </ion-col>
+              <ion-col></ion-col>
+              <ion-col></ion-col>
+              <ion-col>
+                <strong>{{loanData.getTotalLoan() | currency : 'GBP' : true : '1.0-0'}}</strong>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+
+        <h4>Interest</h4>
+
+        <p>
+          From the day you start studying, you start paying interest on your loan. To show this, we've broken down each year
+          you study, and the approximate amount of interest you will owe on it by the time you graduate.
+        </p>
+
+        <div>
+          <div>
+            <ion-row>
+              <ion-col>
+                <strong>Year</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Total</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Interest %</strong>
+              </ion-col>
+              <ion-col>
+                <strong>Interest Amount</strong>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngFor="let l of loanData.loan.loanBreakdown">
+              <ion-col>
+                {{l.year}}
+              </ion-col>
+              <ion-col>
+                {{l.maintenance + l.tuition | currency : 'GBP' : true : '1.0-0'}}
+              </ion-col>
+              <ion-col>
+                {{loanData.getInterestLevel(l.year, true) * 100 | number:'1.1-1'}}%
+              </ion-col>
+              <ion-col>
+                {{
+                loanData.calcInterestOverYears(
+                l.maintenance + l.tuition,
+                l.year,
+                loanData.loan.years - (l.year - loanData.loan.startingYear)
+                ) | currency : 'GBP' : true : '1.0-0'
+                }}
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <strong>Total</strong>
+              </ion-col>
+              <ion-col></ion-col>
+              <ion-col></ion-col>
+              <ion-col>
+                <strong>{{loanData.getTotalInterest() | currency:'GBP':true:'1.0-0'}}</strong>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+
+  <h2>Repayments</h2>
+
+  <p>
+    Both repayments and interest you pay on your student loan after you graduate are based on your income.
+  </p>
+
+  <h3>Select your Salary</h3>
+
+  <ion-range [(ngModel)]="estimatedSalary" color="danger" pin="true" min="5000" step="1000" max="200000"></ion-range>
+
+  <div>
+    <ion-row>
+      <ion-col>
+        Salary:<br/>
+        {{estimatedSalary | currency: 'GBP' : true : '1.0-0' }}
+      </ion-col>
+      <ion-col>
+        Interest:<br/>
+        {{ loanData.getRpi(2017) * 100 + loanData.getVariableInterestAfterStudy(estimatedSalary) * 100 | number:'1.1-1' }}%
+      </ion-col>
+      <ion-col>
+        Annual Repayments:<br/>
+        {{ loanData.eligibleRepaymentAmount(estimatedSalary) * loanData.interestPayments.repaymentPc | currency: 'GBP' : true : '1.0-0' }}
+      </ion-col>
+    </ion-row>
+  </div>
+
+
+
+  <div class="accordion-container" [ngClass]="{'open': accordion[1] }">
+
+    <div class="accordion-opener">
+      <button no-padding ion-button clear class="accordion-opener-closed" (click)="accordion[1] = true">See breakdown ></button>
+      <button no-padding ion-button clear class="accordion-opener-open" (click)="accordion[1] = false">Hide breakdown ></button>
+    </div>
+    <div class="accordion-content">
+      <div>
+
+        <h4>Interest</h4>
+        <p>
+          The minimum interest you will pay is RPI (Retail Price Index) calculated yearly. If you earn over
+          {{loanData.interestPayments.lowerThreshold | currency: 'GBP' : true : '1.0-0' }}, you will start to pay more
+          interest. If you earn more than {{loanData.interestPayments.higherThreshold | currency: 'GBP' : true : '1.0-0' }},
+          you will pay RPI + {{ loanData.interestPayments.higherInterest * 100 | number : '1.0-1' }}%.
+        </p>
+        <p>
+          RPI: {{ loanData.getRpi(2017) * 100 | number:'1.1-1' }}%<br/>
+          Interest based on salary: {{ loanData.getVariableInterestAfterStudy(estimatedSalary) * 100 | number:'1.1-1' }}%<br/>
+          Total Interest: {{ loanData.getRpi(2017) * 100 + loanData.getVariableInterestAfterStudy(estimatedSalary) * 100 | number:'1.1-1' }}%
+        </p>
+
+        <h4>Repayments</h4>
+        <p>
+          Student loans are paid back based on your earnings, for a maximum of {{ loanData.interestPayments.maxPaymentYear }}
+          years following the April after you graduate. {{ loanData.interestPayments.repaymentPc * 100 | number:'1.0-0' }}%
+          of your earnings over {{loanData.interestPayments.lowerThreshold | currency: 'GBP' : true : '1.0-0' }} will be
+          repaid to your student loan.
+        </p>
+        <p>
+          Eligible for repayment: {{ loanData.eligibleRepaymentAmount(estimatedSalary) | currency: 'GBP' : true : '1.0-0' }}<br/>
+          Repayment: {{ loanData.interestPayments.repaymentPc * 100 | number:'1.0-0'}}%<br/>
+          Annual Repayment: {{ loanData.eligibleRepaymentAmount(estimatedSalary) * loanData.interestPayments.repaymentPc | currency: 'GBP' : true : '1.0-0' }}
+        </p>
+
+
+      </div>
+    </div>
+
+  </div>
+
+</ion-content>
+
+<ion-header>
+  <ion-navbar>
+    <ion-title>Summary</ion-title>
+  </ion-navbar>
+</ion-header>

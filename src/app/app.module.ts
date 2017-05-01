@@ -10,6 +10,10 @@ import { TabsPage } from '../pages/tabs/tabs';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import {LoanCalcService} from "../services/loan-calc.service";
+import {SummaryPage} from "../pages/summary/summary";
+
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 @NgModule({
   declarations: [
@@ -17,10 +21,12 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     AboutPage,
     ContactPage,
     HomePage,
-    TabsPage
+    TabsPage,
+    SummaryPage
   ],
   imports: [
     BrowserModule,
+    ChartsModule,
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],
@@ -29,11 +35,13 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     AboutPage,
     ContactPage,
     HomePage,
-    TabsPage
+    TabsPage,
+    SummaryPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
+    LoanCalcService,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

@@ -14,3 +14,42 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
+
+
+.color-light {
+  color: #666;
+}
+
+ion-range .range-slider .range-pin {
+  display: none;
+}
+
+.accordion-container {
+
+  .accordion-content {
+    position: relative;
+    max-height: 0;
+    overflow: hidden;
+
+    -webkit-transition: max-height 1s;
+    -moz-transition: max-height 1s;
+    -ms-transition: max-height 1s;
+    -o-transition: max-height 1s;
+    transition: max-height 1s;
+  }
+
+  &.open .accordion-content {
+    max-height: 650px;
+  }
+
+  .accordion-opener-open,
+  &.open .accordion-opener-closed {
+    display: none;
+  }
+
+  .accordion-opener-closed,
+  &.open .accordion-opener-open {
+    display: block;
+  }
+
+}

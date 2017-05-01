@@ -5,13 +5,142 @@
 </ion-header>
 
 <ion-content padding>
-  <h2>Welcome to Ionic!</h2>
-  <p>
-    This starter project comes with simple tabs-based layout for apps
-    that are going to primarily use a Tabbed UI.
-  </p>
-  <p>
-    Take a look at the <code>src/pages/</code> directory to add or change tabs,
-    update any existing page or create new pages.
-  </p>
+
+  <ion-slides pager="true" paginationType="progress">
+
+    <ion-slide>
+      <h1>Student Loan Calculator</h1>
+      <p>
+        The world of student loans is complicated because there are so many different rules, and factors that play into your
+        loan. Knowing how much your loan will be, how much interest you will pay and how long it will take to pay it back.
+      </p>
+      <p>
+        This calculator is designed to help you understand how much your loan will be, how much interest you will pay, and
+        how long it will take to pay back.
+      </p>
+
+      <button ion-button block (click)="slideNext()">Get Started</button>
+      <button ion-button block color="secondary" (click)="goToLawyerExample()">Use Lawyer Example</button>
+    </ion-slide>
+
+
+    <ion-slide text-left>
+      <h1>Student Loan Amount</h1>
+
+      <div class="calculator-question">
+        <h3>What year did you start studying?</h3>
+
+        <p>
+          <small class="color-light">
+            <ion-icon name="information-circle"></ion-icon>
+            This affects your tuition fee and maintenance loan amounts
+          </small>
+        </p>
+
+        <ion-segment [(ngModel)]="loanData.loan.startingYear">
+          <ion-segment-button [value]="2015">2015</ion-segment-button>
+          <ion-segment-button [value]="2016">2016</ion-segment-button>
+          <ion-segment-button [value]="2017">2017</ion-segment-button>
+        </ion-segment>
+
+        <p>
+          &nbsp;
+          <small class="color-light" *ngIf="loanData.tuitionFees[loanData.loan.startingYear]">
+            You will pay {{ loanData.tuitionFees[loanData.loan.startingYear] | currency : 'GBP' : true : '1.0-0' }} per year
+          </small>
+        </p>
+
+      </div>
+
+      <div class="calculator-question">
+        <h3>How many years is your course?</h3>
+        <ion-segment [(ngModel)]="loanData.loan.years">
+          <ion-segment-button [value]="1">1 year</ion-segment-button>
+          <ion-segment-button [value]="2">2 years</ion-segment-button>
+          <ion-segment-button [value]="3">3 years</ion-segment-button>
+          <ion-segment-button [value]="4">4 years</ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <p>
+        <button ion-button block (click)="slideNext()">Next Step</button>
+      </p>
+    </ion-slide>
+
+
+
+    <ion-slide>
+
+      <h1>Maintenance Loan Amount</h1>
+
+      <p>
+        Part of the maintenance loan is based on parental income, we are assuming the full loan so you can best budget.
+      </p>
+
+      <div class="calculator-question">
+        <h3>Where are you Living?</h3>
+        <ion-segment [(ngModel)]="loanData.loan.maintenanceOptions.livesWithParents">
+          <ion-segment-button [value]="false">Away From Home</ion-segment-button>
+          <ion-segment-button [value]="true">With Parents</ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <div class="calculator-question">
+        <h3>Where are you Studying?</h3>
+        <ion-segment [(ngModel)]="loanData.loan.maintenanceOptions.studiesInLondon">
+          <ion-segment-button [value]="false">Outside of London</ion-segment-button>
+          <ion-segment-button [value]="true">In London</ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <p>
+        <small class="color-light" *ngIf="loanData.loan.maintenanceOptions.livesWithParents != undefined && loanData.loan.maintenanceOptions.studiesInLondon != undefined">
+          You will receive up to {{ loanData.getMaintenanceLoan(loanData.loan.startingYear) | currency : 'GBP' : true : '1.0-0' }}
+          in Maintenance Loans in your first year (this raises around 3% every year after).
+        </small>
+        &nbsp;
+      </p>
+
+      <ion-row>
+        <ion-col>
+          <button ion-button block color="light" (click)="slidePrev()">Go Back</button>
+        </ion-col>
+        <ion-col>
+          <button ion-button block (click)="slideNext()">Next Step</button>
+        </ion-col>
+      </ion-row>
+
+    </ion-slide>
+
+
+
+    <ion-slide>
+      <h1>Salary Information</h1>
+
+      <p>
+        Just select your future career and we'll map out how long it will take for you to pay off your student loan.
+      </p>
+
+      <ion-item>
+        <ion-label>Career</ion-label>
+        <ion-select [(ngModel)]="career" interface="popover">
+          <ion-option value="lawyer">Lawyer</ion-option>
+          <ion-option value="webdev" disabled="true">Web Developer (coming soon)</ion-option>
+          <ion-option value="accountant" disabled="true">Accountant (coming soon)</ion-option>
+          <ion-option value="banker" disabled="true">Investment Banker (coming soon)</ion-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-row>
+        <ion-col>
+          <button ion-button block color="light" (click)="slidePrev()">Go Back</button>
+        </ion-col>
+        <ion-col>
+          <button ion-button block (click)="goToSummary()">See Summary</button>
+        </ion-col>
+      </ion-row>
+    </ion-slide>
+
+  </ion-slides>
+
 </ion-content>
