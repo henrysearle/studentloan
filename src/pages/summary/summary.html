@@ -42,8 +42,17 @@
 
         <p>
           The amount you owe when you graduate is dependent on a few factors which will mostly effect your maintenance loan.
-          We've estimated the loan based on a <strong>3 year course</strong>, <strong>living in London</strong>
-          <strong>away from your parents</strong>. We've also estimated RPI for 2017-2019.
+          We've estimated the loan based on a <strong>{{loanData.loan.years}} year course</strong>,
+          <strong>
+            <span *ngIf="!loanData.loan.maintenanceOptions.studiesInLondon">not</span>
+            living in London
+          </strong>
+          <strong>
+            <span *ngIf="loanData.loan.maintenanceOptions.livesWithParents">with your parents</span>
+            <span *ngIf="!loanData.loan.maintenanceOptions.livesWithParents">away from your parents</span>
+          </strong>.
+
+          We've also estimated RPI past 2017.
         </p>
 
         <div>
